@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="basicos.cu">
+      <Filter>TodoRedesNeuronales</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GestorPunteroPunteroFloatDevice.cu">
+      <Filter>TodoRedesNeuronales</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GestorPunteroPunteroFloatHost.cu">
+      <Filter>TodoRedesNeuronales</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RedNeuronalSecuencial.cu">
+      <Filter>TodoRedesNeuronales</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="FuncionesArchivos">
+      <UniqueIdentifier>{b24e8a59-58b5-460f-887b-265999322878}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TodoRedesNeuronales">
+      <UniqueIdentifier>{5e2fce5d-09bc-4be9-80fd-851dd039a3f2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="file_manager.cpp">
+      <Filter>FuncionesArchivos</Filter>
+    </ClCompile>
+    <ClCompile Include="funciones_archivos.cpp">
+      <Filter>FuncionesArchivos</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveFile.cpp">
+      <Filter>FuncionesArchivos</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="file_manager.h">
+      <Filter>FuncionesArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="funciones_archivos.h">
+      <Filter>FuncionesArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveFile.h">
+      <Filter>FuncionesArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="basicos.cuh">
+      <Filter>TodoRedesNeuronales</Filter>
+    </ClInclude>
+    <ClInclude Include="GestorPunteroPunteroFloatDevice.cuh">
+      <Filter>TodoRedesNeuronales</Filter>
+    </ClInclude>
+    <ClInclude Include="GestorPunteroPunteroFloatHost.cuh">
+      <Filter>TodoRedesNeuronales</Filter>
+    </ClInclude>
+    <ClInclude Include="RedNeuronalSecuencial.cuh">
+      <Filter>TodoRedesNeuronales</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
