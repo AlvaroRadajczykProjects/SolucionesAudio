@@ -4,6 +4,10 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 #wav files
+2_TestearRedNeuronal/audios_prueba
+RedNeuronalArtificialSecuencial/a_musiquitas
+RedNeuronalArtificialSecuencial/audio_source
+RedNeuronalArtificialSecuencial/audio_target
 *.wav
 
 # User-specific files
