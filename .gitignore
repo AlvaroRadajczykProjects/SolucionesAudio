@@ -3,11 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+#archivo de red
+red.data
+
 #wav files
-2_TestearRedNeuronal/audios_prueba
-RedNeuronalArtificialSecuencial/a_musiquitas
-RedNeuronalArtificialSecuencial/audio_source
-RedNeuronalArtificialSecuencial/audio_target
+audio_source/
+audio_target/
 *.wav
 
 # User-specific files

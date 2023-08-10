@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="basicos.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GestorPunteroPunteroFloatDevice.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GestorPunteroPunteroFloatHost.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RedNeuronalSecuencial.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="FuncionesArchivos">
+      <UniqueIdentifier>{3683a789-e0dc-465d-b6e3-92357a800839}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TodoRedNeuronal">
+      <UniqueIdentifier>{7a76b81a-e033-496b-ad42-af370daf56fe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="file_manager.cpp">
+      <Filter>FuncionesArchivos</Filter>
+    </ClCompile>
+    <ClCompile Include="funciones_archivos.cpp">
+      <Filter>FuncionesArchivos</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveFile.cpp">
+      <Filter>FuncionesArchivos</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="file_manager.h">
+      <Filter>FuncionesArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="funciones_archivos.h">
+      <Filter>FuncionesArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveFile.h">
+      <Filter>FuncionesArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="basicos.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+    <ClInclude Include="GestorPunteroPunteroFloatDevice.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+    <ClInclude Include="GestorPunteroPunteroFloatHost.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+    <ClInclude Include="RedNeuronalSecuencial.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

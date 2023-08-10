@@ -2,18 +2,21 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <iostream>
+#include <ctime>
+#include <chrono>
 #include <cstring>
 
 #include <portaudio.h>
 
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
+#include "RedNeuronalSecuencial.cuh"
 
 #define SAMPLE_RATE 44100
-#define FRAMES_PER_BUFFER 1024 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
+#define FRAMES_PER_BUFFER 512 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
 
-float* d_input;
-float* d_output;
+using namespace std;
+
+RedNeuronalSecuencial* r;
 
 __global__ void processAudioKernel(const float* input, float* output)
 {
@@ -29,13 +32,19 @@ static int patestCallback(
 	void* userData
 ) {
 
-	float* input = (float*)inputBuffer;
-	float* output = (float*)outputBuffer;
+	float* ve = (float*)inputBuffer;
+	float* v3 = (float*)outputBuffer;
 
-	cudaMemcpy(d_input, input, FRAMES_PER_BUFFER * sizeof(float), cudaMemcpyHostToDevice);
-	processAudioKernel << <1, FRAMES_PER_BUFFER >> > (d_input, d_output);
-	cudaMemcpy(output, d_output, FRAMES_PER_BUFFER * sizeof(float), cudaMemcpyDeviceToHost);
-	cudaDeviceSynchronize();
+	r->propagacionDelanteRapido(ve, v3, 1);
+
+	//float* pred = r->propagacionHaciaDelante(1, FRAMES_PER_BUFFER, ve);
+	//cudaDeviceSynchronize();
+	//memcpy(v3, pred, FRAMES_PER_BUFFER * sizeof(float));
+	//free(pred);
+		
+	//for (int i = 0; i < 1024; i++) { v3[i] = (i + 1) / (float)1024; }
+
+	//memcpy(v3, ve, FRAMES_PER_BUFFER * sizeof(float));
 
 	return paContinue;
 }
@@ -73,9 +82,9 @@ void showDevices(int numDevices) {
 
 int main(int argc, char** argv) {
 
-	cudaMalloc(&d_input, FRAMES_PER_BUFFER * sizeof(float));
-	cudaMalloc(&d_output, FRAMES_PER_BUFFER * sizeof(float));
+	r = new RedNeuronalSecuencial("..\\red.data");
 	cudaDeviceSynchronize();
+	r->iniciarModoPropagacionDelanteRapido();
 
 	PaError err;
 	err = Pa_Initialize();
@@ -101,6 +110,9 @@ int main(int argc, char** argv) {
 
 	err = Pa_Terminate();
 	checkErr(err);
+	
+	r->terminarModoPropagacionDelanteRapido();
+	delete r;
 
 	return EXIT_SUCCESS;
 }

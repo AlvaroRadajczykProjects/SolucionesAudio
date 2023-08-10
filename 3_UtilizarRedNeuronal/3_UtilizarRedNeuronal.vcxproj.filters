@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="basicos.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GestorPunteroPunteroFloatDevice.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+    <CudaCompile Include="GestorPunteroPunteroFloatHost.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RedNeuronalSecuencial.cu">
+      <Filter>TodoRedNeuronal</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="file_manager.cpp">
+      <Filter>TodoGestionArchivos</Filter>
+    </ClCompile>
+    <ClCompile Include="funciones_archivos.cpp">
+      <Filter>TodoGestionArchivos</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="file_manager.h">
+      <Filter>TodoGestionArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="funciones_archivos.h">
+      <Filter>TodoGestionArchivos</Filter>
+    </ClInclude>
+    <ClInclude Include="basicos.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+    <ClInclude Include="GestorPunteroPunteroFloatDevice.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+    <ClInclude Include="GestorPunteroPunteroFloatHost.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+    <ClInclude Include="RedNeuronalSecuencial.cuh">
+      <Filter>TodoRedNeuronal</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="TodoGestionArchivos">
+      <UniqueIdentifier>{cd0f702f-6c65-4e74-8301-b27aa3da19f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TodoRedNeuronal">
+      <UniqueIdentifier>{00670e13-d816-497a-89f9-225fba74e913}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

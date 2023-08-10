@@ -12,7 +12,7 @@
 #include <portaudio.h>
 
 #define SAMPLE_RATE 44100
-#define FRAMES_PER_BUFFER 1024 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
+#define FRAMES_PER_BUFFER 512 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
 
 struct pointers {
     float* ptr1;
@@ -24,8 +24,8 @@ struct pointers devolverDatosEntrenamiento( int* numero_ejemplos, unsigned long 
     struct pointers p;
 
     std::vector<string> archivos = intersection(
-        getVectorCharArrayFilesInDirectory(".\\audio_source"),
-        getVectorCharArrayFilesInDirectory(".\\audio_target")
+        getVectorCharArrayFilesInDirectory("..\\audio_source"),
+        getVectorCharArrayFilesInDirectory("..\\audio_target")
     );
 
     *numero_ejemplos = archivos.size();
@@ -37,23 +37,25 @@ struct pointers devolverDatosEntrenamiento( int* numero_ejemplos, unsigned long 
     unsigned long long offset_entrada = 0;
     unsigned long long offset_salida = 0;
 
+    int tbytes_segmento = FRAMES_PER_BUFFER * 4;
+
     //tomar el tamaño total del array a crear
     for (std::vector<string>::iterator it = archivos.begin(); it != archivos.end(); ++it) {
 
-        string cadena_completa = ".\\audio_source\\" + *it;
+        string cadena_completa = "..\\audio_source\\" + *it;
         narchivo = stdStringAPunteroChar(cadena_completa);
 
         WaveFile* f = new WaveFile(narchivo);
 
         free(narchivo);
-        cadena_completa = ".\\audio_target\\" + *it;
+        cadena_completa = "..\\audio_target\\" + *it;
         narchivo = stdStringAPunteroChar(cadena_completa);
 
         WaveFile* f2 = new WaveFile(narchivo);
 
         //calcular
-        ttotal_entrada += f->getLenData() + (4096 - (f->getLenData()%4096) );
-        ttotal_salida += f2->getLenData() + (4096 - (f2->getLenData()%4096) );
+        ttotal_entrada += f->getLenData() + (tbytes_segmento - (f->getLenData()%tbytes_segmento) );
+        ttotal_salida += f2->getLenData() + (tbytes_segmento - (f2->getLenData()%tbytes_segmento) );
 
         if (ttotal_entrada != ttotal_salida) {
             printf("\nError al cargar datos: tienen un tiempo de duracion distintos los archivos con el nombre %s\n", narchivo);
@@ -72,13 +74,13 @@ struct pointers devolverDatosEntrenamiento( int* numero_ejemplos, unsigned long 
     p.ptr2 = new float[ttotal_salida];
 
     for (std::vector<string>::iterator it = archivos.begin(); it != archivos.end(); ++it) {
-        string cadena_completa = ".\\audio_source\\" + *it;
+        string cadena_completa = "..\\audio_source\\" + *it;
         narchivo = stdStringAPunteroChar(cadena_completa);
 
         WaveFile* f = new WaveFile(narchivo);
 
         free(narchivo);
-        cadena_completa = ".\\audio_target\\" + *it;
+        cadena_completa = "..\\audio_target\\" + *it;
         narchivo = stdStringAPunteroChar(cadena_completa);
 
         WaveFile* f2 = new WaveFile(narchivo);
@@ -88,14 +90,14 @@ struct pointers devolverDatosEntrenamiento( int* numero_ejemplos, unsigned long 
         //pasar datos
         memcpy(p.ptr1 + offset_entrada, (float*)f->getData(), f->getLenData());
         offset_entrada += f->getLenData()/4;
-        while (offset_entrada % 4096 != 0) {
+        while (offset_entrada % FRAMES_PER_BUFFER != 0) {
             p.ptr1[offset_entrada] = 0.0;
             offset_entrada++;
         }
 
         memcpy(p.ptr2 + offset_salida, (float*)f2->getData(), f2->getLenData());
         offset_salida += f2->getLenData()/4;
-        while (offset_salida % 4096 != 0) {
+        while (offset_salida % FRAMES_PER_BUFFER != 0) {
             p.ptr2[offset_salida] = 0.0;
             offset_salida++;
         }
@@ -163,127 +165,32 @@ int main() {
     entrada = p.ptr1;
     salida = p.ptr2;
 
-
-    //PRUEBAS
-    /*
-    RedNeuronalSecuencial* r;
-
-    const int nentradas = 2;
-    const int nsalidas = 1;
-    float tapren = 0.0005;
-    int nepochs = 20000;
-    float* res;
-
-    const int nejemplos = 4;
-    const int batch_size = 4;
-
-    float* de = new float[nentradas * nejemplos] { 0, 0, 0, 1, 1, 0, 1, 1 };
-    float* ds = new float[nsalidas * nejemplos] { 0, 1, 1, 0 };
-
-    r = new RedNeuronalSecuencial(4, new int[4] { nentradas, 10, 10, nsalidas }, new int[3] { 3, 3, 3 });
-
-    r->entrenarRedMSE_Adam(tapren, 0.9, 0.999, 0.000000001, 500, nepochs, nejemplos, batch_size, nentradas, nsalidas, de, ds);
-    //tapren = 0.0001;
-    //r->entrenarRedMSE_SGD(tapren, 100, nepochs, nejemplos, batch_size, nentradas, nsalidas, de, ds);
-
-    r->exportarRedComoArchivo("caca.data");
-
-    r->iniciarCublas();
-
-    res = r->propagacionHaciaDelante(4, nentradas, de);
-    imprimirMatrizPorPantalla("", res, 4, nsalidas);
-    delete res;
-
-    r->terminarCublas();
-
-    delete r;
-
-    r = new RedNeuronalSecuencial("caca.data");
-
-    //r->mostrarPesosBiasesRed();
-
-    r->iniciarCublas();
-
-    res = r->propagacionHaciaDelante(4, nentradas, de);
-    imprimirMatrizPorPantalla("", res, 4, nsalidas);
-    delete res;
-
-    r->terminarCublas();
-
-    r->iniciarModoPropagacionDelanteRapido();
-
-    res = new float[1] {0};
-
-    r->propagacionDelanteRapido(new float[2] {0, 0}, res, 2);
-    printf("\n%.8f", res[0]);
-    r->propagacionDelanteRapido(new float[2] {0, 1}, res, 2);
-    printf("\n%.8f", res[0]);
-    r->propagacionDelanteRapido(new float[2] {1, 0}, res, 2);
-    printf("\n%.8f", res[0]);
-    r->propagacionDelanteRapido(new float[2] {1, 1}, res, 2);
-    printf("\n%.8f\n", res[0]);
-
-    r->terminarModoPropagacionDelanteRapido();
-
-    delete r;
-    */
-
     printf("\nNumero de ejemplos: %d\n", numero_ejemplos);
 
     const int nentradas = FRAMES_PER_BUFFER;
     const int nsalidas = FRAMES_PER_BUFFER;
-    float tapren = 0.001;
-    int nepochs = 200000;
+    float tapren = 0.0001;
+    int nepochs = 10000;
 
-    const int nejemplos = tam_arr / 1024;//tam_arr/1024;//tam_arr%1024;
-    const int batch_size = 20000;
+    const int nejemplos = tam_arr / FRAMES_PER_BUFFER;//tam_arr/1024;//tam_arr%1024;
+    const int batch_size = 65536;
 
     RedNeuronalSecuencial* r;
 
     //entrenar desde 0
-    r = new RedNeuronalSecuencial(3, new int[3] { nentradas, 64, nsalidas }, new int[2] { 1, 1 });
+    r = new RedNeuronalSecuencial(3, new int[3] { nentradas, 128, nsalidas }, new int[2] { 1, 1 });
 
     //entrenar desde archivo
     //r = new RedNeuronalSecuencial("../EscucharGrabarVezPruebaProcesamientoRedNeuronal/red.data");
 
-    //utilizar primero sgd no ayuda, a lo mejor debería ser al revés. La tasa de aprendizaje debe ser muy baja. Prueba otras inicializaciones de números aleatorios
-    //r->entrenarRedMSE_SGD(tapren, 100, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
-    r->entrenarRedMSE_Adam(tapren, 0.9, 0.999, 0.000000001, 500, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
-
-    r->exportarRedComoArchivo("../2_TestearRedNeuronal/red.data");
-    r->exportarRedComoArchivo("../EscucharGrabarVezPruebaProcesamientoRedNeuronal/red.data");
-
-    delete r;
-
-    /*
-    PaError err;
-    err = Pa_Initialize();
-    checkErr(err);
-
-    int numDevices = Pa_GetDeviceCount();
-    manageNumberDevices(numDevices);
-
-    PaStream* stream;
-    err = Pa_OpenDefaultStream(&stream, 0, 1, paFloat32, SAMPLE_RATE, FRAMES_PER_BUFFER, nullptr, nullptr);
-    checkErr(err);
-
-    err = Pa_StartStream(stream);
-    checkErr(err);
-
-    for (int i = 0; i < tam_arr; i += FRAMES_PER_BUFFER) {
-        err = Pa_WriteStream(stream, entrada + i, FRAMES_PER_BUFFER);
-        checkErr(err);
+    //un error de 0,00005 es bastante bueno
+    for (int i = 0; i < 5; i++) {
+        printf("\n\n=============================== FASE %d ===============================\n\n", i + 1);
+        r->entrenarRedMSE_Adam(tapren, 0.9, 0.999, 0.000000001, 500, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
+        r->exportarRedComoArchivo("..\\red.data");
     }
 
-    err = Pa_StopStream(stream);
-    checkErr(err);
-
-    err = Pa_CloseStream(stream);
-    checkErr(err);
-
-    err = Pa_Terminate();
-    checkErr(err);
-    */
+    delete r;
 
     return 0;
 }

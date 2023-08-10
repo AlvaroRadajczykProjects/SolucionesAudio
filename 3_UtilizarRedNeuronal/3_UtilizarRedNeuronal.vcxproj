@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5828B465-04C5-41E8-9D60-5E4758359B5D}</ProjectGuid>
-    <RootNamespace>EscucharGrabarVezPruebaProcesamientoRedNeuronal</RootNamespace>
+    <RootNamespace>3_UtilizarRedNeuronal</RootNamespace>
     <ProjectName>3_UtilizarRedNeuronal</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
