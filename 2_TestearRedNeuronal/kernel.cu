@@ -122,7 +122,7 @@ int main() {
     float* buffer = new float[FRAMES_PER_BUFFER];
 
     for (int i = 0; i < tam_arr; i += FRAMES_PER_BUFFER) {
-        r->propagacionDelanteRapido(entrada + i, buffer, 1);
+        r->propagacionDelanteRapido(entrada + i, buffer, 4, 3);
         err = Pa_WriteStream(stream, buffer, FRAMES_PER_BUFFER);
         checkErr(err);
     }

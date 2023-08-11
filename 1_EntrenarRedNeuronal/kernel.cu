@@ -167,27 +167,34 @@ int main() {
 
     printf("\nNumero de ejemplos: %d\n", numero_ejemplos);
 
+    //printf("\nNormalizando conjunto de entrenamiento...\n");
+
+    //normalizar(entrada, tam_arr/4);
+
+    //printf("\nconjunto de entrenamiento normalizado\n");
+
     const int nentradas = FRAMES_PER_BUFFER;
     const int nsalidas = FRAMES_PER_BUFFER;
-    float tapren = 0.0003;
+    float tapren = 0.0009;
     int nepochs = 10000;
 
     const int nejemplos = tam_arr / FRAMES_PER_BUFFER;//tam_arr/1024;//tam_arr%1024;
-    const int batch_size = 65536*2;
+    const int batch_size = 65536;
 
     RedNeuronalSecuencial* r;
 
     //entrenar desde 0
-    //r = new RedNeuronalSecuencial(3, new int[3] { nentradas, 128, nsalidas }, new int[2] { 1, 1 });
+    r = new RedNeuronalSecuencial(3, new int[3] { nentradas, 512, nsalidas }, new int[2] { 5, 4 });
 
     //entrenar desde archivo
-    r = new RedNeuronalSecuencial("..\\red.data");
+    //r = new RedNeuronalSecuencial("..\\red.data");
 
     //un error de 0,00005 es bastante bueno
     for (int i = 0; i < 5; i++) {
         printf("\n\n=============================== FASE %d ===============================\n\n", i + 1);
         //r->entrenarRedMSE_SGD(tapren, 500, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
         r->entrenarRedMSE_Adam(tapren, 0.9, 0.999, 0.000000001, 500, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
+        if(tapren > 0.0001){ tapren -= 0.0002; }
         //tapren = tapren / 2;
         r->exportarRedComoArchivo("..\\red.data");
     }

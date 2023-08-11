@@ -19,6 +19,7 @@ void imprimirVectorIntPorPantalla(char* texto_mostrar, float vector[], int inici
 void imprimirMatrizPorPantalla(char* texto_mostrar, float matriz[], int n_filas, int n_columnas);
 
 const void matrizTraspuestaDevice(float* odata, float* idata, int m, int n);
+const void normalizar(float* data, unsigned long long length);
 
 class RedNeuronalSecuencial {
 
@@ -96,7 +97,7 @@ class RedNeuronalSecuencial {
 		void entrenarRedMSE_Adam(float tapren, float b1, float b2, float epsilon, int mostrar_fcoste_cada_n_epocas, int nepocas, int nejemplos, int batch_size, int nvalsentrada, int nvalsalida, float* ventrada, float* vsalida);
 
 		void iniciarModoPropagacionDelanteRapido();
-		const void propagacionDelanteRapido(const float* input, float* output, int idfun);
+		const void propagacionDelanteRapido(const float* input, float* output, int idfunco, int idfuncs);
 		void terminarModoPropagacionDelanteRapido();
 
 		void iniciarCublas();

@@ -35,7 +35,7 @@ static int patestCallback(
 	float* ve = (float*)inputBuffer;
 	float* v3 = (float*)outputBuffer;
 
-	r->propagacionDelanteRapido(ve, v3, 1);
+	r->propagacionDelanteRapido(ve, v3, 2, 3);
 
 	//float* pred = r->propagacionHaciaDelante(1, FRAMES_PER_BUFFER, ve);
 	//cudaDeviceSynchronize();

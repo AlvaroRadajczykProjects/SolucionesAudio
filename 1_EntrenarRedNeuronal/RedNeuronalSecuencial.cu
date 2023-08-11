@@ -35,7 +35,9 @@ const void aplicarFuncion(int id, float* zl, float* al, int nfilas, int ncolumna
 	if (id == 0) { aplicarFuncionSigmoideCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (zl, al, nfilas, ncolumnas); }
 	else if (id == 1) { aplicarFuncionTahnCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (zl, al, nfilas, ncolumnas); }
 	else if (id == 2) { aplicarFuncionCosenoEspecialCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (zl, al, nfilas, ncolumnas); }
-	else if (id == 3) { aplicarFuncionPReluCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (zl, al, nfilas, ncolumnas); }
+	else if (id == 3) { aplicarFuncionReluCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (zl, al, nfilas, ncolumnas); }
+	else if(id == 4){ aplicarFuncionLinealCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (zl, al, nfilas, ncolumnas); }
+	else if(id == 5){ aplicarFuncionELUCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (zl, al, nfilas, ncolumnas); }
 	//cudaDeviceSynchronize();
 }
 
@@ -43,7 +45,9 @@ const void aplicarDerivadaFuncion(int id, float* m, int nfilas, int ncolumnas) {
 	if (id == 0) { aplicarDerivadaFuncionSigmoideCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (m, nfilas, ncolumnas); }
 	else if (id == 1) { aplicarDerivadaFuncionTahnCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (m, nfilas, ncolumnas); }
 	else if (id == 2) { aplicarDerivadaFuncionCosenoEspecialCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (m, nfilas, ncolumnas); }
-	else if (id == 3) { aplicarDerivadaFuncionPReluCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (m, nfilas, ncolumnas); }
+	else if (id == 3) { aplicarDerivadaFuncionReluCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (m, nfilas, ncolumnas); }
+	else if(id == 4){ aplicarDerivadaFuncionLinealCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (m, nfilas, ncolumnas); }
+	else if(id == 5){ aplicarDerivadaFuncionELUCadaElementoMatriz << < dim3Ceil(nfilas / (float)32, ncolumnas / (float)32), dim3(32, 32) >> > (m, nfilas, ncolumnas); }
 	//cudaDeviceSynchronize();
 }
 
@@ -100,9 +104,16 @@ const void applyTahnFunction(const int tm, float* dst) {
 	}
 }
 
-const void applyPReluFunction(const int tm, float* dst) {
+const void applyReluFunction(const int tm, float* dst) {
 	for (int i = 0; i < tm; i++) {
-		if (dst[i] < 0) { dst[i] = dst[i] * 0.01; }
+		if (dst[i] < 0) { dst[i] = 0; }
+		//else { dst[i] = dst[i]; }
+	}
+}
+
+const void applyELUFunction(const int tm, float* dst) {
+	for (int i = 0; i < tm; i++) {
+		if (dst[i] < 0) { dst[i] = 0.03 *(exp(dst[i])-1); }
 		//else { dst[i] = dst[i]; }
 	}
 }
@@ -110,7 +121,25 @@ const void applyPReluFunction(const int tm, float* dst) {
 const void aplicarFuncionHost(int id, const int tm, float* dst) {
 	if (id == 0) { applyFastSigmoidFunction(tm, dst); }
 	else if (id == 1) { applyTahnFunction(tm, dst); }
-	else if (id == 2) { applyPReluFunction(tm, dst); }
+	else if (id == 2) { applyReluFunction(tm, dst); }
+	//else if(id == 3){ funcionLineal }
+	else if (id == 4) { applyELUFunction(tm, dst); }
+	//e
+}
+
+const void normalizar(float* data, unsigned long long length) {
+	float min = 1000.0;
+	float max = -1000.0;
+
+	for (unsigned long long i = 0; i < length; i++) {
+		if (data[i] < min) { min = data[i]; }
+		if (data[i] > max) { max = data[i]; }
+	}
+
+	float den = max - min;
+	for (unsigned long long i = 0; i < length; i++) {
+		data[i] = (data[i] - min) / den;
+	}
 }
 
 RedNeuronalSecuencial::RedNeuronalSecuencial(int nc, int* dc, int* fc) {
@@ -306,7 +335,7 @@ void RedNeuronalSecuencial::cargarEnDevice(bool iniciarValoresBiasesWeights) {
 		for (int i = 0; i < device_weight_matrices->getNumeroElementos(); i++) {
 			//generarNumerosAleatoriosEnDistribucionNormal(generador_dnorm, 0.0, 1.0, punteros_en_host_de_device_weights[i], device_weight_matrices->getDimensionesElementos()[i]);
 			//min(1.0,2/(float)device_bias_vectors->getDimensionesElementos()[i])
-			generarNumerosAleatoriosEnDistribucionNormal(generador_dnorm, 0.0, min(1.0, 2 / (float)device_bias_vectors->getDimensionesElementos()[i]), punteros_en_host_de_device_weights[i], device_weight_matrices->getDimensionesElementos()[i]);
+			generarNumerosAleatoriosEnDistribucionNormal(generador_dnorm, 0.0, 2 / (float)dimensiones_capas[i], punteros_en_host_de_device_weights[i], device_weight_matrices->getDimensionesElementos()[i]);
 		}
 
 		curandDestroyGenerator(generador_dnorm);
@@ -883,20 +912,20 @@ void RedNeuronalSecuencial::iniciarModoPropagacionDelanteRapido() {
 	calc_matrix_fast2 = new float[may];
 }
 
-const void RedNeuronalSecuencial::propagacionDelanteRapido(const float* input, float* output, int idfun) {
+const void RedNeuronalSecuencial::propagacionDelanteRapido(const float* input, float* output, int idfunco, int idfuncs) {
 	computeGold(input, host_weight_matrices_fast[0], calc_matrix_fast, 1, dimensiones_capas[0], dimensiones_capas[1]);
 	sumarVectores(dimensiones_capas[1], calc_matrix_fast, host_bias_vectors_fast[0]);
-	aplicarFuncionHost(idfun, dimensiones_capas[1], calc_matrix_fast);
+	aplicarFuncionHost(idfunco, dimensiones_capas[1], calc_matrix_fast);
 	for (int i = 1; i < numero_capas - 2; i++) {
 		computeGold(calc_matrix_fast, host_weight_matrices_fast[i], calc_matrix_fast2, 1, dimensiones_capas[i], dimensiones_capas[i + 1]);
 		memcpy(calc_matrix_fast, calc_matrix_fast2, dimensiones_capas[i + 1]*sizeof(float));
 		sumarVectores(dimensiones_capas[i + 1], calc_matrix_fast, host_bias_vectors_fast[i]);
-		aplicarFuncionHost(idfun, dimensiones_capas[i + 1], calc_matrix_fast);
+		aplicarFuncionHost(idfunco, dimensiones_capas[i + 1], calc_matrix_fast);
 	}
 	computeGold(calc_matrix_fast, host_weight_matrices_fast[numero_capas - 2], calc_matrix_fast2, 1, dimensiones_capas[numero_capas - 2], dimensiones_capas[numero_capas - 1]);
 	sumarVectores(dimensiones_capas[numero_capas - 1], calc_matrix_fast2, host_bias_vectors_fast[numero_capas - 2]);
 	memcpy(output, calc_matrix_fast2, dimensiones_capas[numero_capas - 1] * sizeof(float));
-	aplicarFuncionHost(idfun, dimensiones_capas[numero_capas - 1], output);
+	aplicarFuncionHost(idfuncs, dimensiones_capas[numero_capas - 1], output);
 }
 
 void RedNeuronalSecuencial::terminarModoPropagacionDelanteRapido() {

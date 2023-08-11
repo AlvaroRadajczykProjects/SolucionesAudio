@@ -28,7 +28,11 @@ __global__ void aplicarFuncionTahnCadaElementoMatriz(float* zl, float* al, int n
 
 __global__ void aplicarFuncionCosenoEspecialCadaElementoMatriz(float* zl, float* al, int nrows, int ncols);
 
-__global__ void aplicarFuncionPReluCadaElementoMatriz(float* zl, float* al, int nrows, int ncols);
+__global__ void aplicarFuncionReluCadaElementoMatriz(float* zl, float* al, int nrows, int ncols);
+
+__global__ void aplicarFuncionLinealCadaElementoMatriz(float* zl, float* al, int nrows, int ncols);
+
+__global__ void aplicarFuncionELUCadaElementoMatriz(float* zl, float* al, int nrows, int ncols);
 
 //ERROR CAPA OUTPUT
 
@@ -45,7 +49,11 @@ __global__ void aplicarDerivadaFuncionTahnCadaElementoMatriz(float* m, int nrows
 
 __global__ void aplicarDerivadaFuncionCosenoEspecialCadaElementoMatriz(float* m, int nrows, int ncols);
 
-__global__ void aplicarDerivadaFuncionPReluCadaElementoMatriz(float* m, int nrows, int ncols);
+__global__ void aplicarDerivadaFuncionReluCadaElementoMatriz(float* m, int nrows, int ncols);
+
+__global__ void aplicarDerivadaFuncionLinealCadaElementoMatriz(float* m, int nrows, int ncols);
+
+__global__ void aplicarDerivadaFuncionELUCadaElementoMatriz(float* m, int nrows, int ncols);
 
 //T(idata) = odata
 __global__ void matrizTraspuesta(float* odata, float* idata, int nrows, int ncols);

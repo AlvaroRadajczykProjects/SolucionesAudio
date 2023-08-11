@@ -133,13 +133,34 @@ __global__ void aplicarFuncionCosenoEspecialCadaElementoMatriz(float* zl, float*
     }
 }
 
-__global__ void aplicarFuncionPReluCadaElementoMatriz(float* zl, float* al, int nrows, int ncols)
+__global__ void aplicarFuncionReluCadaElementoMatriz(float* zl, float* al, int nrows, int ncols)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (idx < nrows && idy < ncols) {
-        al[idx * ncols + idy] = fmaxf( 0.01*zl[idx * ncols + idy], zl[idx * ncols + idy]);
+        al[idx * ncols + idy] = fmaxf( 0, zl[idx * ncols + idy]);
+    }
+}
+
+__global__ void aplicarFuncionLinealCadaElementoMatriz(float* zl, float* al, int nrows, int ncols)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (idx < nrows && idy < ncols) {
+        al[idx * ncols + idy] = zl[idx * ncols + idy];
+    }
+}
+
+__global__ void aplicarFuncionELUCadaElementoMatriz(float* zl, float* al, int nrows, int ncols)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (idx < nrows && idy < ncols) {
+        if (zl[idx * ncols + idy] < 0) { al[idx * ncols + idy] = 0.03 * ( expf(zl[idx * ncols + idy]) - 1 ); }
+        else { al[idx * ncols + idy] = zl[idx * ncols + idy]; }
     }
 }
 
@@ -202,16 +223,37 @@ __global__ void aplicarDerivadaFuncionCosenoEspecialCadaElementoMatriz(float* m,
     }
 }
 
-__global__ void aplicarDerivadaFuncionPReluCadaElementoMatriz(float* m, int nrows, int ncols)
+__global__ void aplicarDerivadaFuncionReluCadaElementoMatriz(float* m, int nrows, int ncols)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     int idy = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (idx < nrows && idy < ncols) {
-        if (m[idx * ncols + idy] < 0) { m[idx * ncols + idy] = 0.01; }
+        if (m[idx * ncols + idy] < 0) { m[idx * ncols + idy] = 0; }
         else{ m[idx * ncols + idy] = 1; }
     }
 }
+__global__ void aplicarDerivadaFuncionLinealCadaElementoMatriz(float* m, int nrows, int ncols)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (idx < nrows && idy < ncols) {
+        m[idx * ncols + idy] = 1;
+    }
+}
+
+__global__ void aplicarDerivadaFuncionELUCadaElementoMatriz(float* m, int nrows, int ncols)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int idy = blockIdx.y * blockDim.y + threadIdx.y;
+
+    if (idx < nrows && idy < ncols) {
+        if (m[idx * ncols + idy] < 0) { m[idx * ncols + idy] = 0.03 * expf(m[idx * ncols + idy]); }
+        else { m[idx * ncols + idy] = 1; }
+    }
+}
+
 //T(idata) = odata
 __global__ void matrizTraspuesta(float* odata, float* idata, int nrows, int ncols)
 {
