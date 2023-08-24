@@ -12,7 +12,7 @@
 #include <portaudio.h>
 
 #define SAMPLE_RATE 44100
-#define FRAMES_PER_BUFFER 512 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
+#define FRAMES_PER_BUFFER 256 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
 
 float* devolverDatosEntrenamiento(int* numero_ejemplos, unsigned long long* tam_arr) {
 
@@ -72,6 +72,13 @@ float* devolverDatosEntrenamiento(int* numero_ejemplos, unsigned long long* tam_
 
 }
 
+float* desplazar(float* input, unsigned long long length, int offset) {
+    float* res = new float[length];
+    memcpy(res+offset, input, (length-offset)*sizeof(float));
+    memcpy(res, input + (length - offset), offset * sizeof(float));
+    return res;
+}
+
 static void checkErr(PaError err) {
     if (err != paNoError) {
         printf("PortAudio error: %s\n", Pa_GetErrorText(err));
@@ -100,6 +107,8 @@ int main() {
     float* entrada = 0;
 
     entrada = devolverDatosEntrenamiento(&numero_ejemplos, &tam_arr);
+
+    entrada = desplazar(entrada, tam_arr, 48000*3);
 
     RedNeuronalSecuencial* r = new RedNeuronalSecuencial("..\\red.data");
     cudaDeviceSynchronize();

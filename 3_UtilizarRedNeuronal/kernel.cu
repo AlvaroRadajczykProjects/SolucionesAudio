@@ -12,7 +12,7 @@
 #include "RedNeuronalSecuencial.cuh"
 
 #define SAMPLE_RATE 44100
-#define FRAMES_PER_BUFFER 512 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
+#define FRAMES_PER_BUFFER 256 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
 
 using namespace std;
 

@@ -12,7 +12,7 @@
 #include <portaudio.h>
 
 #define SAMPLE_RATE 44100
-#define FRAMES_PER_BUFFER 512 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
+#define FRAMES_PER_BUFFER 256 //lo hace 512 veces por segundo? si más grande más datos y más lento aunque a veces puede ser útil
 
 struct pointers {
     float* ptr1;
@@ -179,12 +179,12 @@ int main() {
     int nepochs = 10000;
 
     const int nejemplos = tam_arr / FRAMES_PER_BUFFER;//tam_arr/1024;//tam_arr%1024;
-    const int batch_size = 65536;
+    const int batch_size = 65536;//65536;
 
     RedNeuronalSecuencial* r;
 
     //entrenar desde 0
-    r = new RedNeuronalSecuencial(3, new int[3] { nentradas, 512, nsalidas }, new int[2] { 5, 4 });
+    r = new RedNeuronalSecuencial(4, new int[4] { nentradas, FRAMES_PER_BUFFER, FRAMES_PER_BUFFER, nsalidas }, new int[3] { 5, 5, 4 });
 
     //entrenar desde archivo
     //r = new RedNeuronalSecuencial("..\\red.data");
@@ -192,9 +192,9 @@ int main() {
     //un error de 0,00005 es bastante bueno
     for (int i = 0; i < 5; i++) {
         printf("\n\n=============================== FASE %d ===============================\n\n", i + 1);
-        //r->entrenarRedMSE_SGD(tapren, 500, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
+        //r->entrenarRedMSE_SGD(tapren, 100, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
         r->entrenarRedMSE_Adam(tapren, 0.9, 0.999, 0.000000001, 500, nepochs, nejemplos, batch_size, nentradas, nsalidas, entrada, salida);
-        if(tapren > 0.0001){ tapren -= 0.0002; }
+        if(tapren > 0.0001){ tapren -= 0.0001; }
         //tapren = tapren / 2;
         r->exportarRedComoArchivo("..\\red.data");
     }
